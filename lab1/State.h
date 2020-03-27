@@ -27,6 +27,7 @@ public:
 	char** getBallsPositions() const;
 	friend std::ostream& operator<<(std::ostream& out, const State& state);
 	void Expand(std::vector<State*>& O, std::vector<State*>& C);
+	void setParent(State* state);
 	~State();
 	bool operator==(const State& rhs) const;
 	bool operator!=(const State& rhs) const;

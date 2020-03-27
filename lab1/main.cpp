@@ -45,27 +45,62 @@ State* Solution(State* startState,State* targetState)
 {
 	using namespace std;
 	std::vector<State*> O, C;	
-	O.reserve(10000);
+	O.reserve(100000);
 	C.reserve(10000);
-	O.push_back(startState);
+	O.push_back(new State(*startState));
 	
 	bool searched = false;	
 	clock_t start = clock();
 	while (O.size() > 0)
-	{		
+	{				
 		auto currentState = O.front();	
 		if (*currentState == *targetState)
 		{
 			clock_t end = clock();
-			double seconds = (double)(end - start) / CLOCKS_PER_SEC;
+			double seconds = ((double)end - start) / CLOCKS_PER_SEC;
 			cout << "The time of search is " << seconds << " seconds" << endl;
 			cout << "Iterations count: " << (C.size()) << endl;
-			return currentState;
-		}								
-		O.erase(O.begin());
+			
+			
+			auto tmp = new State(*currentState);
+			auto tmp2 = currentState->getParent();
+			auto solution = tmp;
+			while (tmp2->getParent() != nullptr)
+			{
+				tmp->setParent(tmp2);
+				tmp = tmp->getParent();
+				tmp2 = tmp2->getParent();
+			}			
+			tmp->setParent(nullptr);
+			for (size_t i = 0; i < O.size(); i++)
+			{
+				delete O[i];
+				O[i] = nullptr;
+			}
+			for (size_t i = 0; i < C.size(); i++)
+			{
+				delete C[i];
+				C[i] = nullptr;
+			}
+			O.clear();
+			C.clear();
+			return solution;
+		}			
+		O.erase(O.begin());		
 		C.push_back(currentState);													
 		currentState->Expand(O, C);
 	}	
+	for (size_t i = 0; i < O.size(); i++)
+	{
+		delete O[i];
+		O[i] = nullptr;
+	}
+	for (size_t i = 0; i < C.size(); i++)
+	{
+		delete C[i];
+		C[i] = nullptr;
+	}
+	return nullptr;
 	return nullptr;
 }
 void print(char** arr, int w, int h)
@@ -158,7 +193,7 @@ int main()
 						if (s == nullptr)
 						{
 							cout << "Solution not found!";
-							return 1;
+							/*return 1;*/
 						}
 
 						State* tmp = s;
